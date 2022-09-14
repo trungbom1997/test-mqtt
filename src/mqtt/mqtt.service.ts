@@ -11,6 +11,6 @@ const record = new MqttRecordBuilder(`${payload}`)
   .setProperties({ userProperties })
   .setQoS(1)
   .build();
-    this.client.send('send-room', `This room Id is: ${record}`).subscribe((response) => console.log(response));
+    this.client.send('set-room', `This room Id is: ${record}`).subscribe((response) => console.log(response));
   }
 }

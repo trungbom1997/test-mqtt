@@ -18,7 +18,7 @@ export class MqttController {
     this.mqttService.getTestMqtt(data);
   }
 
-  @MessagePattern('pattern')
+  @MessagePattern('set-room')
   replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
     return 'OK';
   }
