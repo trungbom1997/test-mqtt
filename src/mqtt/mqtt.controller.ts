@@ -1,24 +1,26 @@
-import { Controller } from '@nestjs/common';
-import {
-  Ctx,
-  MessagePattern,
-  MqttContext,
-  Payload,
-} from '@nestjs/microservices';
+import { Controller, UseFilters, UseInterceptors } from '@nestjs/common';
+import { Ctx, MessagePattern, MqttContext, Payload } from '@nestjs/microservices';
 import { MqttService } from './mqtt.service';
+import { ExceptionFilter } from './rpc-exception.filter';
+import { TransformInterceptor } from './transform.interceptor';
+
 
 @Controller('mqtt')
 export class MqttController {
   constructor(private readonly mqttService: MqttService) {}
 
-  @MessagePattern('get-room')
-  getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
+  @MessagePattern('send-room')
+  @UseFilters(new ExceptionFilter())
+  @UseInterceptors(new TransformInterceptor())
+  async sendRoomId(@Payload() data: string, @Ctx() context: MqttContext) {
     console.log(`Topic: ${context.getTopic()}`);
-    console.log(`Data:`, data);
-    this.mqttService.getTestMqtt(data);
+    console.log(JSON.stringify(data))
+    return await this.mqttService.sendRoomIdToSubscriber(data as any);
   }
 
-  @MessagePattern('set-room')
+  @MessagePattern('get-room')
+  @UseFilters(new ExceptionFilter())
+  @UseInterceptors(new TransformInterceptor())
   replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
     return 'OK';
   }
